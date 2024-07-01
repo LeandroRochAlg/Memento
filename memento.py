@@ -5,6 +5,10 @@ class Memento:
     def __init__(self, state):
         self.state = state
 
+class Text:
+    def __init__(self, text):
+        self.text = text
+
 class TextEditor:
     def __init__(self, text_widget):
         self.text_widget = text_widget  # instância da tela de texto do tkinter
@@ -15,27 +19,28 @@ class TextEditor:
         self.text_widget.insert(tk.END, text)
 
     def save(self):
-        state = self.text_widget.get("1.0", tk.END) # obtém o conteúdo do widget
-        self.history.append(Memento(state))
+        text = Text(self.text_widget.get("1.0", tk.END)) # obtém o conteúdo do widget
+
+        self.history.append(Memento(text))
         self.future.clear()
 
     def undo(self):
         if self.history:
-            self.future.append(Memento(self.text_widget.get("1.0", tk.END)))
+            self.future.append(Memento(Text(self.text_widget.get("1.0", tk.END))))
             memento = self.history.pop()
 
             # Atualiza o conteúdo do widget
             self.text_widget.delete("1.0", tk.END)
-            self.text_widget.insert(tk.END, memento.state)
+            self.text_widget.insert(tk.END, memento.state.text)
 
     def redo(self):
         if self.future:
-            self.history.append(Memento(self.text_widget.get("1.0", tk.END)))
+            self.history.append(Memento(Text(self.text_widget.get("1.0", tk.END))))
             memento = self.future.pop()
 
             # Atualiza o conteúdo do widget
             self.text_widget.delete("1.0", tk.END)
-            self.text_widget.insert(tk.END, memento.state)
+            self.text_widget.insert(tk.END, memento.state.text)
 
 class Application(tk.Tk):
     def __init__(self):
